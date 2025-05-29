@@ -85,12 +85,17 @@ class BluetoothService extends EventEmitter {
     const target = event.target as BluetoothRemoteGATTCharacteristic;
     if (!target?.value) return;
 
-    // Parse the received data according to your device's protocol
-    // This is a placeholder implementation
+    const value = target.value;
+    const dataArray = new Uint8Array(value.buffer);
+    const decoder = new TextDecoder('utf-8');
+    const dataString = decoder.decode(dataArray);
+    const rawData = JSON.parse(dataString)
+    console.log("Raw IMU data:", rawData);
+
     const data: IMUData = {
       id: 'imu1',
       position: { x: 0, y: 0, z: 0 },
-      orientation: { x: 0, y: 0, z: 0 },
+      orientation: rawData,
       isOutOfPosition: false
     };
 

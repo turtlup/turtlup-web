@@ -102,7 +102,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         return (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <Typography variant="h6" gutterBottom>
-              Stand in a neutral position
+              Sit in a neutral position
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               Keep your back straight and shoulders relaxed and click the button below when ready.
