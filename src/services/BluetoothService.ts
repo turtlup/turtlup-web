@@ -85,6 +85,13 @@ class BluetoothService extends EventEmitter {
     const target = event.target as BluetoothRemoteGATTCharacteristic;
     if (!target?.value) return;
 
+    const value = target.value;
+    const dataArray = new Uint8Array(value.buffer);
+    console.log("BluetoothService: Data array:", dataArray);
+    // covnert the dataArray to a string or parse it as needed
+    const decoder = new TextDecoder('utf-8');
+    const dataString = decoder.decode(dataArray);
+    console.log("BluetoothService: Decoded data string:", dataString);
     // Parse the received data according to your device's protocol
     // This is a placeholder implementation
     const data: IMUData = {

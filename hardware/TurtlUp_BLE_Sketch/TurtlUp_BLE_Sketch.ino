@@ -1,24 +1,26 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <BLE2902.h>
 
 #define SERVICE_UUID        "12345678-1234-1234-1234-123456789abc"
-#define CHAR_WRITE_UUID    "ef015678-1234-1234-1234-abcdef123456"
-#define CHAR_NOTIFY_UUID     "abcd1234-1234-1234-1234-abcdef123456"
+#define CHAR_WRITE_UUID     "ef015678-1234-1234-1234-abcdef123456"
+#define CHAR_NOTIFY_UUID    "abcd1234-1234-1234-1234-abcdef123456"
 
 BLECharacteristic* notifyChar;
 
 class MyCallbacks : public BLECharacteristicCallbacks {
-  void onWrite(BLECharacteristic* characteristic) {
-    String value = characteristic->getValue().c_str();
-    Serial.print("Received: ");
-    Serial.println(value);
+  void onWrite(BLECharacteristic* characteristic) override {
+    String strValue = String((const char*)characteristic->getValue().c_str());
 
-    if (value == "CALIBRATE") {
+    Serial.print("Received: ");
+    Serial.println(strValue);
+
+    if (strValue == "CALIBRATE") {
       Serial.println("Calibration triggered!");
-    } else if (value.startsWith("MODE:")) {
+    } else if (strValue.startsWith("MODE:")) {
       Serial.print("Set mode: ");
-      Serial.println(value.substring(5));
+      Serial.println(strValue.substring(5));
     }
   }
 };
@@ -35,7 +37,6 @@ void setup() {
     BLECharacteristic::PROPERTY_NOTIFY
   );
 
-  // Add the CCCD to the notify characteristic
   notifyChar->addDescriptor(new BLE2902());
 
   BLECharacteristic* writeChar = service->createCharacteristic(
@@ -63,4 +64,3 @@ void loop() {
     lastSend = millis();
   }
 }
-
