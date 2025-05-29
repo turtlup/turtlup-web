@@ -3,8 +3,8 @@
 #include <BLEServer.h>
 
 #define SERVICE_UUID        "12345678-1234-1234-1234-123456789abc"
-#define CHAR_NOTIFY_UUID    "abcd1234-1234-1234-1234-abcdef123456"
-#define CHAR_WRITE_UUID     "efgh5678-1234-1234-1234-abcdef123456"
+#define CHAR_WRITE_UUID    "ef015678-1234-1234-1234-abcdef123456"
+#define CHAR_NOTIFY_UUID     "abcd1234-1234-1234-1234-abcdef123456"
 
 BLECharacteristic* notifyChar;
 
@@ -34,6 +34,9 @@ void setup() {
     CHAR_NOTIFY_UUID,
     BLECharacteristic::PROPERTY_NOTIFY
   );
+
+  // Add the CCCD to the notify characteristic
+  notifyChar->addDescriptor(new BLE2902());
 
   BLECharacteristic* writeChar = service->createCharacteristic(
     CHAR_WRITE_UUID,
