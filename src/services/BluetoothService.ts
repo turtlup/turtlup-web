@@ -87,17 +87,17 @@ class BluetoothService extends EventEmitter {
 
     const value = target.value;
     const dataArray = new Uint8Array(value.buffer);
-    console.log("BluetoothService: Data array:", dataArray);
-    // covnert the dataArray to a string or parse it as needed
+    // convert the dataArray to a string
     const decoder = new TextDecoder('utf-8');
     const dataString = decoder.decode(dataArray);
     console.log("BluetoothService: Decoded data string:", dataString);
-    // Parse the received data according to your device's protocol
-    // This is a placeholder implementation
+    const rawData = JSON.parse(dataString)
+    console.log("Raw IMU data:", rawData);
+
     const data: IMUData = {
       id: 'imu1',
       position: { x: 0, y: 0, z: 0 },
-      orientation: { x: 0, y: 0, z: 0 },
+      orientation: rawData,
       isOutOfPosition: false
     };
 
