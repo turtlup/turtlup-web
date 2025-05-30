@@ -17,6 +17,33 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
     width * 0.35, height * 0.6, // Left hip
   ];
 
+  // Function to determine circle color based on IMU data
+  const getCircleColor = (imu: IMUData) => {
+    // Map orientation to color - use all 3 axes for more dynamic visualization
+    const xLevel = Math.abs(imu.orientation.ax);
+    const yLevel = Math.abs(imu.orientation.ay);
+    const zLevel = Math.abs(imu.orientation.az);
+    
+    // Threshold for movement detection
+    const threshold = 5;
+    
+    if (xLevel > threshold ) {
+      // Calculate intensity based on highest movement value
+      const maxLevel = Math.max(xLevel, yLevel, zLevel);
+      const intensity = Math.min(255, Math.round((maxLevel / 20) * 255));
+      
+      // Red gets more intense with higher values
+      const red = Math.min(255, 100 + intensity);
+      const green = Math.max(0, 255 - intensity);
+      const blue = 50;
+      
+      return `rgb(${red},${green},${blue})`;
+    }
+    
+    // Default color when stable (green)
+    return '#44ff44';
+  };
+
   return (
     <Stage width={width} height={height}>
       <Layer>
@@ -29,17 +56,24 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
         />
 
         {/* Draw IMU points */}
-        {imuData.map((imu, index) => (
-          <Circle
-            key={imu.id}
-            x={imu.position.x * width}
-            y={imu.position.y * height}
-            radius={10}
-            fill={imu.isOutOfPosition ? '#ff4444' : '#44ff44'}
-            stroke="#333"
-            strokeWidth={2}
-          />
-        ))}
+        {imuData.map((imu, index) => {
+          // Get the position based on the predefined points
+          const positionIndex = index % 4;
+          const x = torsoPoints[positionIndex * 2];
+          const y = torsoPoints[positionIndex * 2 + 1];
+          
+          return (
+            <Circle
+              key={imu.id}
+              x={x}
+              y={y}
+              radius={10}
+              fill={getCircleColor(imu)}
+              stroke="#333"
+              strokeWidth={2}
+            />
+          );
+        })}
       </Layer>
     </Stage>
   );

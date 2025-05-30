@@ -8,9 +8,9 @@ interface IMUData {
     z: number;
   };
   orientation: {
-    x: number;
-    y: number;
-    z: number;
+    ax: number;
+    ay: number;
+    az: number;
   };
   isOutOfPosition: boolean;
 }
