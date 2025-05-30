@@ -89,13 +89,13 @@ class BluetoothService extends EventEmitter {
     const dataArray = new Uint8Array(value.buffer);
     const decoder = new TextDecoder('utf-8');
     const dataString = decoder.decode(dataArray);
-    const rawData = JSON.parse(dataString)
-    console.log("Raw IMU data:", rawData);
+    const imuData = JSON.parse(dataString)
+    console.log("Raw IMU data:", imuData);
 
     const data: IMUData = {
       id: 'imu1',
       position: { x: 0, y: 0, z: 0 },
-      orientation: rawData,
+      orientation: imuData,
       isOutOfPosition: false
     };
 
