@@ -9,7 +9,7 @@ interface OnboardingProps {
 
 const steps = [
   'Connect Device',
-  'Stand in Neutral Position',
+  'Sit in Neutral Position',
   'Calibrate Sensors',
   'Complete'
 ];
@@ -173,7 +173,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <Button
               variant="contained"
               onClick={handleNext}
-              disabled={activeStep === 0 && !isConnected || activeStep === steps.length - 1}
+              disabled={activeStep === 0 && !isConnected }
             >
               {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
             </Button>
