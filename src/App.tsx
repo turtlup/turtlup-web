@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {CssBaseline, ThemeProvider, createTheme} from '@mui/material';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import PostureStats from './pages/PostureStats';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
-import {CssBaseline, ThemeProvider, createTheme} from '@mui/material';
 
 const theme = createTheme({
   palette: {
