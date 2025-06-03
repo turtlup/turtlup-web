@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import {CssBaseline, ThemeProvider, createTheme} from '@mui/material';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import PostureStats from './pages/PostureStats';

@@ -1,20 +1,16 @@
 import { EventEmitter } from 'events';
 
+
 interface IMUData {
-  id: string;
-  position: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  orientation: {
-    ax: number;
-    ay: number;
-    az: number;
-  };
-  isOutOfPosition: boolean;
+  ax: number;
+  ay: number;
+  az: number;
 }
 
+export interface IMUDataWithId {
+  id: string; // Unique identifier for each IMU
+  data: IMUData[]; // Array of IMU data
+}
 class BluetoothService extends EventEmitter {
   private device: BluetoothDevice | null = null;
   private service: BluetoothRemoteGATTService | null = null;
@@ -92,13 +88,11 @@ class BluetoothService extends EventEmitter {
     const imuData = JSON.parse(dataString)
     console.log("Raw IMU data:", imuData);
 
-    const data: IMUData = {
-      id: 'imu1',
-      position: { x: 0, y: 0, z: 0 },
-      orientation: imuData,
-      isOutOfPosition: false
-    };
-
+    const data: IMUDataWithId = {
+      id: `imuData-${new Date().getTime()}`, // Generate a unique ID based on timestamp
+      data: imuData.data
+    }
+  
     this.emit('imuData', data);
   }
 
