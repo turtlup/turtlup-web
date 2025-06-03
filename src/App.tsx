@@ -6,10 +6,9 @@ import PostureStats from './pages/PostureStats';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
 import React, { useState, useEffect } from 'react';
-import { Container, CssBaseline, ThemeProvider, createTheme, Button, Typography, Box, Select, MenuItem, List, ListItem } from '@mui/material';
-import { bluetoothService, IMUData, IMUDataWithId } from './services/BluetoothService';
-import Onboarding from './components/Onboarding';
-import BodyModel from './components/BodyModel';
+import {CssBaseline, ThemeProvider, createTheme} from '@mui/material';
+import { bluetoothService, IMUDataWithId } from './services/BluetoothService';
+
 
 const theme = createTheme({
   palette: {
