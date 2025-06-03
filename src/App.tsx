@@ -1,14 +1,12 @@
 
+import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import PostureStats from './pages/PostureStats';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
-import React, { useState, useEffect } from 'react';
 import {CssBaseline, ThemeProvider, createTheme} from '@mui/material';
-import { bluetoothService, IMUDataWithId } from './services/BluetoothService';
-
 
 const theme = createTheme({
   palette: {
@@ -71,50 +69,6 @@ const theme = createTheme({
 });
 
 const App: React.FC = () => {
-
-  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
-  const [imuData, setImuData] = useState<IMUDataWithId[]>([]);
-  const [log, setLog] = useState<string[]>([]);
-
-  useEffect(() => {
-    bluetoothService.on('imuData', (data: IMUDataWithId) => {
-      setImuData((prev) => {
-        const newData = [...prev];
-        newData.push(data);
-        // Limit to the last 100 entries for performance
-        if (newData.length > 100) {
-          newData.shift();
-        }
-        return newData;
-      });
-    });
-
-    bluetoothService.on('log', (message: string) => {
-      setLog((prev) => [...prev, message]);
-    });
-
-    return () => {
-      bluetoothService.removeAllListeners();
-    };
-  }, []);
-
-  const handleOnboardingComplete = () => {
-    setIsOnboardingComplete(true);
-  };
-
-  const connectToDevice = async () => {
-    try {
-      await bluetoothService.connect();
-    } catch (error) {
-      console.error("Connection attempt failed:", error);
-    }
-  };
-
-  const sendCommand = (cmd: string) => {
-    const encoder = new TextEncoder();
-    bluetoothService.sendData(encoder.encode(cmd));
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
