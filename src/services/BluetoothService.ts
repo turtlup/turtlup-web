@@ -90,7 +90,7 @@ class BluetoothService extends EventEmitter {
 
     const data: IMUDataWithId = {
       id: `imuData-${new Date().getTime()}`, // Generate a unique ID based on timestamp
-      data: imuData.data || []
+      data: imuData
     }
   
     this.emit('imuData', data);
