@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Stepper, Step, StepLabel, Paper, useTheme } from '@mui/material';
-import { bluetoothService } from '../services/BluetoothService';
+import { bluetoothService, IMUDataWithId } from '../services/BluetoothService';
 import BodyModel from './BodyModel';
 
 interface OnboardingProps {
@@ -25,18 +25,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       console.log("Bluetooth connected event triggered.");
       setIsConnected(true);
     });
-    bluetoothService.on('imuData', (data) => setImuData((prev) => {
-      // In a real scenario, you'd update the specific IMU data
-      // For visualization, we'll just add the data for now or update if ID exists
-      const newData = [...prev];
-      const index = newData.findIndex(imu => imu.id === data.id);
-      if (index > -1) {
-        newData[index] = data;
-      } else {
+    bluetoothService.on('imuData', (data: IMUDataWithId) => {
+      setImuData((prev) => {
+        const newData = [...prev];
         newData.push(data);
-      }
-      return newData;
-    }));
+        // Limit to the last 100 entries for performance
+        if (newData.length > 100) {
+          newData.shift();
+        }
+        return newData;
+      });
+    });
     bluetoothService.on('disconnected', () => {
       console.log("Bluetooth disconnected event triggered.");
       setIsConnected(false);
