@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, Stepper, Step, StepLabel, Paper } from '@mui/material';
+import { Box, Button, Typography, Stepper, Step, StepLabel, Paper, useTheme } from '@mui/material';
 import { bluetoothService } from '../services/BluetoothService';
 import BodyModel from './BodyModel';
 
@@ -18,6 +18,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [imuData, setImuData] = useState<any[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const theme = useTheme();
 
   React.useEffect(() => {
     bluetoothService.on('connected', () => {
@@ -79,7 +80,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     switch (step) {
       case 0:
         return (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Box sx={{ textAlign: 'center' }}>
             <Typography variant="h6" gutterBottom>
               Connect your posture sensor device
             </Typography>
@@ -87,9 +88,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               variant="contained"
               onClick={handleConnect}
               disabled={isConnected}
-              sx={{ mt: 2 }}
+              sx={{ mt: 2, px: 6, py: 2, fontSize: '1rem' }}
             >
-              {isConnected ? 'Connected' : 'Connect Device'}
+              {isConnected ? 'CONNECTED' : 'CONNECT DEVICE'}
             </Button>
             {isConnected && (
               <Typography variant="body1" color="success.main" sx={{ mt: 2 }}>
@@ -151,29 +152,68 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   };
 
   return (
-    <Paper sx={{ p: 4, maxWidth: 600, mx: 'auto', mt: 4 }}>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-      <Box sx={{ mt: 4 }}>
-        {renderStepContent(activeStep)}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+    <Paper elevation={0} sx={{
+      p: 4,
+      display: 'flex',
+      flexDirection: 'column',
+      height: 698,
+      mt: 0,
+    }}>
+
+      {/* Content section for Stepper, content, and buttons */}
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', pb: theme.spacing(2.5) }}>
+        <Stepper activeStep={activeStep} alternativeLabel sx={{
+          mb: 4,
+          justifyContent: 'center',
+          '& .MuiStepLabel-label': { fontSize: '0.9rem' },
+          '& .MuiStepIcon-root': {
+            width: 28,
+            height: 28,
+            '& .MuiStepIcon-text': { fontSize: '0.7rem' }
+          }
+        }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+        {/* Container for step content, takes remaining space */}
+        <Box sx={{
+          mt: 4,
+          mb: 4,
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          '& .MuiTypography-h6': {
+            fontSize: '1.5rem',
+            mb: 3
+          },
+          '& .MuiTypography-body1': {
+            fontSize: '1rem'
+          }
+        }}>
+          {renderStepContent(activeStep)}
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 4 }}>
           <Button
-            disabled={activeStep === 0 || activeStep === steps.length - 1} // Disable back on first and last step
+            disabled={activeStep === 0 || activeStep === steps.length - 1}
             onClick={handleBack}
+            size="medium"
+            variant="text"
+            sx={{ p: 0 }}
           >
             Back
           </Button>
-          {/* The "Next" button is handled within the step content now for step 1 */}
           {activeStep !== 1 && (
             <Button
               variant="contained"
               onClick={handleNext}
-              disabled={activeStep === 0 && !isConnected }
+              disabled={activeStep === 0 && !isConnected}
+              size="medium"
+              // sx={{ p: 0 }} // Removed padding here as well
             >
               {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
             </Button>
