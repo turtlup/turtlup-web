@@ -1,12 +1,12 @@
-
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import {CssBaseline, ThemeProvider, createTheme} from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import PostureStats from './pages/PostureStats';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
+import { PostureProvider } from './context/PostureContext';
 
 const theme = createTheme({
   palette: {
@@ -72,17 +72,19 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <HashRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/stats" element={<PostureStats />} />
-            <Route path="/calibration" element={<Calibration />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Layout>
-      </HashRouter>
+      <PostureProvider>
+        <HashRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/stats" element={<PostureStats />} />
+              <Route path="/calibration" element={<Calibration />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Layout>
+        </HashRouter>
+      </PostureProvider>
     </ThemeProvider>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Typography, Stepper, Step, StepLabel, Paper, useTheme } from '@mui/material';
 import { bluetoothService, IMUDataWithId } from '../services/BluetoothService';
 import BodyModel from './BodyModel';
+import { usePosture } from '../context/PostureContext';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -19,6 +20,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [imuData, setImuData] = useState<any[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const theme = useTheme();
+  const { setReferencePosture } = usePosture();
 
   React.useEffect(() => {
     bluetoothService.on('connected', () => {
@@ -66,12 +68,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     }
   };
 
-  // Placeholder for calibration logic
+  // Update the startCalibration function
   const startCalibration = () => {
     console.log("Starting calibration...");
-    // In a real app, you would send a command to the device here
-    // sendCommand('CALIBRATE_NEUTRAL_POSITION');
-    // After sending command and potentially receiving confirmation,
+    
+    // Save the most recent IMU data as the reference posture
+    if (imuData.length > 0) {
+      const mostRecentData = imuData[imuData.length - 1];
+      setReferencePosture(mostRecentData);
+      console.log("Reference posture saved:", mostRecentData);
+    }
+    
     handleNext(); // Move to the next step (Calibrate Sensors)
   };
 
@@ -212,7 +219,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               onClick={handleNext}
               disabled={activeStep === 0 && !isConnected}
               size="medium"
-              // sx={{ p: 0 }} // Removed padding here as well
+            // sx={{ p: 0 }} // Removed padding here as well
             >
               {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
             </Button>
