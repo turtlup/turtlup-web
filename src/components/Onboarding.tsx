@@ -10,7 +10,6 @@ interface OnboardingProps {
 const steps = [
   'Connect Device',
   'Sit in Neutral Position',
-  'Calibrate Sensors',
   'Complete'
 ];
 
@@ -92,10 +91,18 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </Typography>
             {/* Only render BodyModel if we have data */}
             {currentImuData && (
-              <BodyModel
-                width={300}
-                height={400}
-              />
+              <Box sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                mb: 2
+              }}>
+                <BodyModel
+                  width={300}
+                  height={400}
+                />
+              </Box>
             )}
             <Button
               variant="contained"
@@ -103,20 +110,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               disabled={!isConnected || !currentImuData} // Only enable if device is connected and data is available
               sx={{ mt: 3 }}
             >
-              Ready to Calibrate
+              Calibrate
             </Button>
-          </Box>
-        );
-      case 2:
-        return (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Calibrating sensors...
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Please remain still while we calibrate your sensors
-            </Typography>
-            {/* Potentially show progress or data here */}
           </Box>
         );
       case 3:

@@ -13,6 +13,7 @@ interface BodyModelProps {
 const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
   const {
     currentImuData,
+    referencePosture,
     isConnected,
     connectDevice,
     setReferencePosture
@@ -44,13 +45,15 @@ const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
           const x = torsoPoints[positionIndex * 2];
           const y = torsoPoints[positionIndex * 2 + 1];
 
+          // compare 
+
           return (
             <Circle
-              key={`${color}-${index}`}
+              key={`${1}-${index}`}
               x={x}
               y={y}
               radius={10}
-              fill={color}
+              fill={"#333"}
               stroke="#333"
               strokeWidth={2}
             />

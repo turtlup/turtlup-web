@@ -86,13 +86,13 @@ class BluetoothService extends EventEmitter {
     const decoder = new TextDecoder('utf-8');
     const dataString = decoder.decode(dataArray);
     const imuData = JSON.parse(dataString)
-    console.log("Raw IMU data:", imuData);
+    // console.log("Raw IMU data:", imuData);
 
     const data: IMUDataWithId = {
       id: `imuData-${new Date().getTime()}`, // Generate a unique ID based on timestamp
       data: imuData.data
     }
-  
+
     this.emit('imuData', data);
   }
 
