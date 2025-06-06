@@ -16,9 +16,7 @@ const PostureStats: React.FC = () => {
     }
 
     // Count how many readings show good posture
-    const goodPostureCount = imuDataHistory.filter(data =>
-      isGoodPosture(data)
-    ).length;
+    const goodPostureCount = imuDataHistory.filter(data => data).length;
 
     return {
       totalSamples: imuDataHistory.length,

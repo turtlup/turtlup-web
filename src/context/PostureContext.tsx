@@ -9,7 +9,7 @@ interface PostureContextType {
 
     // IMU data distribution
     currentImuData: IMUDataWithId | null;
-    imuDataHistory: IMUDataWithId[];
+    imuDataHistory: boolean[];
     isConnected: boolean;
     connectDevice: () => Promise<void>;
     disconnectDevice: () => void;
@@ -23,7 +23,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     // IMU data state
     const [currentImuData, setCurrentImuData] = useState<IMUDataWithId | null>(null);
-    const [imuDataHistory, setImuDataHistory] = useState<IMUDataWithId[]>([]);
+    const [imuDataHistory, setImuDataHistory] = useState<boolean[]>([]);
     const [isConnected, setIsConnected] = useState(false);
 
     // Set up Bluetooth event listeners
@@ -44,7 +44,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
 
             // Update history with limited capacity
             setImuDataHistory(prev => {
-                const newHistory = [...prev, data];
+                const newHistory = [...prev, isGoodPosture(data)];
                 // Keep only the last 100 entries for performance
                 if (newHistory.length > 100) {
                     return newHistory.slice(-100);
