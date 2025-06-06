@@ -1,17 +1,80 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { IMUDataWithId } from '../services/BluetoothService';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { IMUDataWithId, bluetoothService } from '../services/BluetoothService';
 
 interface PostureContextType {
+    // Reference posture management
     referencePosture: IMUDataWithId | null;
     setReferencePosture: (data: IMUDataWithId) => void;
     isGoodPosture: (currentData: IMUDataWithId) => boolean;
+
+    // IMU data distribution
+    currentImuData: IMUDataWithId | null;
+    imuDataHistory: IMUDataWithId[];
+    isConnected: boolean;
+    connectDevice: () => Promise<void>;
+    disconnectDevice: () => void;
 }
 
 const PostureContext = createContext<PostureContextType | undefined>(undefined);
 
 export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    // Reference posture state
     const [referencePosture, setReferencePostureState] = useState<IMUDataWithId | null>(null);
 
+    // IMU data state
+    const [currentImuData, setCurrentImuData] = useState<IMUDataWithId | null>(null);
+    const [imuDataHistory, setImuDataHistory] = useState<IMUDataWithId[]>([]);
+    const [isConnected, setIsConnected] = useState(false);
+
+    // Set up Bluetooth event listeners
+    useEffect(() => {
+        bluetoothService.on('connected', () => {
+            console.log("Bluetooth connected event in PostureContext");
+            setIsConnected(true);
+        });
+
+        bluetoothService.on('disconnected', () => {
+            console.log("Bluetooth disconnected event in PostureContext");
+            setIsConnected(false);
+        });
+
+        bluetoothService.on('imuData', (data: IMUDataWithId) => {
+            // Update current IMU data
+            setCurrentImuData(data);
+
+            // Update history with limited capacity
+            setImuDataHistory(prev => {
+                const newHistory = [...prev, data];
+                // Keep only the last 100 entries for performance
+                if (newHistory.length > 100) {
+                    return newHistory.slice(-100);
+                }
+                return newHistory;
+            });
+        });
+
+        return () => {
+            bluetoothService.removeAllListeners();
+        };
+    }, []);
+
+    // Connect device method
+    const connectDevice = async () => {
+        try {
+            await bluetoothService.connect();
+            return Promise.resolve();
+        } catch (error) {
+            console.error("Failed to connect device:", error);
+            return Promise.reject(error);
+        }
+    };
+
+    // Disconnect device method
+    const disconnectDevice = () => {
+        bluetoothService.disconnect();
+    };
+
+    // Set reference posture method
     const setReferencePosture = (data: IMUDataWithId) => {
         console.log('Setting reference posture:', data);
         setReferencePostureState(data);
@@ -46,9 +109,17 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
     return (
         <PostureContext.Provider
             value={{
+                // Reference posture
                 referencePosture,
                 setReferencePosture,
-                isGoodPosture
+                isGoodPosture,
+
+                // IMU data 
+                currentImuData,
+                imuDataHistory,
+                isConnected,
+                connectDevice,
+                disconnectDevice
             }}
         >
             {children}

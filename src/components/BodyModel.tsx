@@ -4,12 +4,13 @@ import { IMUData } from '../services/BluetoothService';
 import { IMUDataWithId } from "../services/BluetoothService";
 
 interface BodyModelProps {
-  imuData: IMUDataWithId[];
+  imuData: IMUDataWithId;
   width: number;
   height: number;
+  goodPosture?: boolean; // Optional prop for posture status
 }
 
-const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
+const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height, goodPosture }) => {
   // Define the torso shape points
   const torsoPoints = [
     width * 0.4, height * 0.2,  // Left shoulder
@@ -18,9 +19,14 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
     width * 0.35, height * 0.6, // Left hip
   ];
 
-  // Function to determine circle color based on IMU data
+  // Function to determine circle color based on IMU data and posture status
   const getCircleColor = (imu: IMUData) => {
-    // Map orientation to color - use all 3 axes for more dynamic visualization
+    // If goodPosture prop is provided, use it to determine color
+    if (goodPosture !== undefined) {
+      return goodPosture ? '#44ff44' : '#ff4444'; // Green for good posture, red for bad
+    }
+
+    // Otherwise use the original logic based on IMU data
     const xLevel = Math.abs(imu.ax);
     const yLevel = Math.abs(imu.ay);
     const zLevel = Math.abs(imu.az);
@@ -45,7 +51,29 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
     return '#44ff44';
   };
 
-  const mostRecentImu = imuData[imuData.length - 1];
+  // Handle the case where imuData is undefined or doesn't have a data property
+  if (!imuData || !imuData.data || imuData.data.length === 0) {
+    return (
+      <Stage width={width} height={height}>
+        <Layer>
+          <Line
+            points={torsoPoints}
+            closed
+            stroke="#333"
+            strokeWidth={2}
+          />
+          <Circle
+            x={width / 2}
+            y={height / 2}
+            radius={10}
+            fill="#999999"
+            stroke="#333"
+            strokeWidth={2}
+          />
+        </Layer>
+      </Stage>
+    );
+  }
 
   return (
     <Stage width={width} height={height}>
@@ -59,7 +87,7 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
         />
 
         {/* Draw IMU points */}
-        {mostRecentImu.data.map((imu:any, index:number) => {
+        {imuData.data.map((imu: any, index: number) => {
           // Get the position based on the predefined points
           const positionIndex = index % 4;
           const x = torsoPoints[positionIndex * 2];
@@ -67,7 +95,7 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
 
           return (
             <Circle
-              key={`${mostRecentImu.id}-${index}`}
+              key={`${imuData.id}-${index}`}
               x={x}
               y={y}
               radius={10}
@@ -76,11 +104,10 @@ const BodyModel: React.FC<BodyModelProps> = ({ imuData, width, height }) => {
               strokeWidth={2}
             />
           );
-        }
-        )}
+        })}
       </Layer>
     </Stage>
-  )
+  );
 };
 
 export default BodyModel;

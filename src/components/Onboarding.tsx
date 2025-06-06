@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Stepper, Step, StepLabel, Paper, useTheme } from '@mui/material';
-import { bluetoothService, IMUDataWithId } from '../services/BluetoothService';
-import BodyModel from './BodyModel';
 import { usePosture } from '../context/PostureContext';
+import BodyModel from './BodyModel';
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -17,36 +16,14 @@ const steps = [
 
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [imuData, setImuData] = useState<any[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
   const theme = useTheme();
-  const { setReferencePosture } = usePosture();
-
-  React.useEffect(() => {
-    bluetoothService.on('connected', () => {
-      console.log("Bluetooth connected event triggered.");
-      setIsConnected(true);
-    });
-    bluetoothService.on('imuData', (data: IMUDataWithId) => {
-      setImuData((prev) => {
-        const newData = [...prev];
-        newData.push(data);
-        // Limit to the last 100 entries for performance
-        if (newData.length > 100) {
-          newData.shift();
-        }
-        return newData;
-      });
-    });
-    bluetoothService.on('disconnected', () => {
-      console.log("Bluetooth disconnected event triggered.");
-      setIsConnected(false);
-    });
-
-    return () => {
-      bluetoothService.removeAllListeners();
-    };
-  }, []);
+  // Use the PostureContext instead of managing state locally
+  const {
+    currentImuData,
+    isConnected,
+    connectDevice,
+    setReferencePosture
+  } = usePosture();
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
@@ -62,7 +39,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   const handleConnect = async () => {
     try {
-      await bluetoothService.connect();
+      await connectDevice(); // Use context method instead
     } catch (error) {
       console.error('Failed to connect:', error);
     }
@@ -71,14 +48,13 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   // Update the startCalibration function
   const startCalibration = () => {
     console.log("Starting calibration...");
-    
+
     // Save the most recent IMU data as the reference posture
-    if (imuData.length > 0) {
-      const mostRecentData = imuData[imuData.length - 1];
-      setReferencePosture(mostRecentData);
-      console.log("Reference posture saved:", mostRecentData);
+    if (currentImuData) {
+      setReferencePosture(currentImuData);
+      console.log("Reference posture saved:", currentImuData);
     }
-    
+
     handleNext(); // Move to the next step (Calibrate Sensors)
   };
 
@@ -114,15 +90,18 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               Keep your back straight and shoulders relaxed and click the button below when ready.
             </Typography>
-            <BodyModel
-              imuData={imuData}
-              width={300}
-              height={400}
-            />
+            {/* Only render BodyModel if we have data */}
+            {currentImuData && (
+              <BodyModel
+                imuData={currentImuData}
+                width={300}
+                height={400}
+              />
+            )}
             <Button
               variant="contained"
               onClick={startCalibration}
-              disabled={!isConnected} // Only enable if device is connected
+              disabled={!isConnected || !currentImuData} // Only enable if device is connected and data is available
               sx={{ mt: 3 }}
             >
               Ready to Calibrate
