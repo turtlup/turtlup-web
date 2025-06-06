@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box, Typography, Button, Paper, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { usePosture } from '../context/PostureContext';
@@ -9,42 +9,10 @@ const Dashboard: React.FC = () => {
   const {
     referencePosture,
     currentImuData,
-    isGoodPosture
   } = usePosture();
 
   // Check if calibration has been performed
   const hasCalibration = referencePosture !== null;
-
-  // Determine posture status
-  const postureStatus = React.useMemo(() => {
-    if (!currentImuData || !hasCalibration) return 'unknown';
-    return isGoodPosture(currentImuData) ? 'good' : 'bad';
-  }, [currentImuData, hasCalibration, isGoodPosture]);
-
-  const getPostureStatusDetails = () => {
-    switch (postureStatus) {
-      case 'good':
-        return {
-          message: 'Your posture looks good!',
-          color: 'success.main',
-          backgroundColor: 'rgba(76, 175, 80, 0.1)'
-        };
-      case 'bad':
-        return {
-          message: 'Poor posture detected. Please sit up straight.',
-          color: 'error.main',
-          backgroundColor: 'rgba(244, 67, 54, 0.1)'
-        };
-      default:
-        return {
-          message: 'Waiting for posture data...',
-          color: 'text.secondary',
-          backgroundColor: 'rgba(0, 0, 0, 0.05)'
-        };
-    }
-  };
-
-  const statusDetails = getPostureStatusDetails();
 
   return (
     <Box sx={{ p: 3 }}>
@@ -86,26 +54,15 @@ const Dashboard: React.FC = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                backgroundColor: statusDetails.backgroundColor,
                 transition: 'background-color 0.5s ease-in-out'
               }}
             >
-              <Typography
-                variant="h5"
-                align="center"
-                color={statusDetails.color}
-                sx={{ mb: 2, fontWeight: 'bold' }}
-              >
-                {statusDetails.message}
-              </Typography>
 
               <Box sx={{ width: '100%', height: 400, display: 'flex', justifyContent: 'center' }}>
                 {currentImuData && (
                   <BodyModel
-                    imuData={currentImuData}
                     width={300}
                     height={400}
-                    goodPosture={postureStatus === 'good'}
                   />
                 )}
               </Box>

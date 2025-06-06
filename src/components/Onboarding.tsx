@@ -93,7 +93,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {/* Only render BodyModel if we have data */}
             {currentImuData && (
               <BodyModel
-                imuData={currentImuData}
                 width={300}
                 height={400}
               />
