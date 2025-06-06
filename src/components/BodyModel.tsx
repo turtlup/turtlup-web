@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stage, Layer, Circle, Line } from 'react-konva';
+import { Stage, Layer, Circle, Text } from 'react-konva';
 import { IMUData } from '../services/BluetoothService';
 import { usePosture } from '../context/PostureContext';
 
@@ -13,55 +13,53 @@ interface BodyModelProps {
 const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
   const {
     currentImuData,
-    referencePosture,
-    isConnected,
-    connectDevice,
-    setReferencePosture
+    isGoodPosture
   } = usePosture();
 
-  // Define the torso shape points
-  const torsoPoints = [
-    width * 0.4, height * 0.2,  // Left shoulder
-    width * 0.6, height * 0.2,  // Right shoulder
-    width * 0.65, height * 0.6, // Right hip
-    width * 0.35, height * 0.6, // Left hip
-  ];
+  const goodPosture = isGoodPosture(currentImuData)
 
   return (
     <Stage width={width} height={height}>
       <Layer>
-        {/* Draw torso outline */}
-        <Line
-          points={torsoPoints}
-          closed
+        <Circle
+          key={`indicator-${currentImuData?.id}`}
+          x={width / 2}
+          y={height / 2}
+          radius={50}
+          fill={goodPosture ? 'green' : 'red'}
           stroke="#333"
           strokeWidth={2}
         />
+        <Text
+          x={width / 2}
+          y={height / 2 + 70} // Position it below the circle
+          text={goodPosture ? "In Alignment 😊" : "Out of Alignment 😔"}
+          fontSize={18}
+          fontFamily="Montserrat"
+          fontStyle="bold"
+          fill={goodPosture ? "green" : "red"}
+          align="center"
+          width={width}
+          offsetX={width / 2} // Center the text horizontally
+        />
+        <Text
+          x={width / 2}
+          y={height / 2 + 100} // Position it below the circle
+          text={goodPosture ? "Good Job!" : "Sit tall - feel strong!"}
+          fontSize={12}
+          fontFamily="Montserrat"
+          fontStyle="bold"
+          fill={goodPosture ? "green" : "red"}
+          align="center"
+          width={width}
+          offsetX={width / 2} // Center the text horizontally
+        />
 
-        {/* Draw IMU points */}
-        {currentImuData?.data.map((imuData: IMUData, index: number) => {
-          // Get the position based on the predefined points
-          const positionIndex = index % 4;
-          const x = torsoPoints[positionIndex * 2];
-          const y = torsoPoints[positionIndex * 2 + 1];
 
-          // compare 
-
-          return (
-            <Circle
-              key={`${1}-${index}`}
-              x={x}
-              y={y}
-              radius={10}
-              fill={"#333"}
-              stroke="#333"
-              strokeWidth={2}
-            />
-          );
-        })}
       </Layer>
     </Stage>
   );
 };
 
+/// in alignment vs 
 export default BodyModel;

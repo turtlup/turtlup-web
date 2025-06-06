@@ -5,7 +5,7 @@ interface PostureContextType {
     // Reference posture management
     referencePosture: IMUDataWithId | null;
     setReferencePosture: (data: IMUDataWithId) => void;
-    isGoodPosture: (currentData: IMUDataWithId) => boolean;
+    isGoodPosture: (currentData: IMUDataWithId | null) => boolean;
 
     // IMU data distribution
     currentImuData: IMUDataWithId | null;
@@ -81,27 +81,24 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
     };
 
     // Function to determine if current posture matches the reference posture
-    const isGoodPosture = (currentData: IMUDataWithId): boolean => {
+    const isGoodPosture = (currentData: IMUDataWithId | null): boolean => {
+        if (!currentData) return false; // No current data to compare   
         if (!referencePosture) return true; // No reference yet
 
         // Compare current IMU data with the reference
         const threshold = 5; // Adjust this based on your sensitivity needs
 
         // Check each IMU sensor data point
-        for (let i = 0; i < Math.min(currentData.data.length, referencePosture.data.length); i++) {
-            const current = currentData.data[i];
-            const reference = referencePosture.data[i];
+        // Calculate deviation from reference
+        const xDiff = Math.abs(currentData.data[0].ax - referencePosture.data[0].ax);
+        const yDiff = Math.abs(currentData.data[0].ay - referencePosture.data[0].ay);
+        const zDiff = Math.abs(currentData.data[0].az - referencePosture.data[0].az);
 
-            // Calculate deviation from reference
-            const xDiff = Math.abs(current.ax - reference.ax);
-            const yDiff = Math.abs(current.ay - reference.ay);
-            const zDiff = Math.abs(current.az - reference.az);
-
-            // If any axis exceeds threshold, posture is bad
-            if (xDiff > threshold || yDiff > threshold || zDiff > threshold) {
-                return false;
-            }
+        // If any axis exceeds threshold, posture is bad
+        if (xDiff > threshold || yDiff > threshold || zDiff > threshold) {
+            return false;
         }
+
 
         return true;
     };
