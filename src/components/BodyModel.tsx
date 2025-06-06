@@ -14,7 +14,6 @@ const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
   const {
     currentImuData,
     isGoodPosture
-
   } = usePosture();
 
   return (

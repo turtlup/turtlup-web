@@ -43,7 +43,6 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
             // Calculate posture status
             const goodPost = postureCheck(data);
             setIsGoodPosture(goodPost);
-            console.log(`Posture check result: ${goodPost ? 'Good' : 'Bad'}`);
 
             // Update history with limited capacity
             setImuDataHistory(prev => {
@@ -103,8 +102,10 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
 
         // If any axis exceeds threshold, posture is bad
         if (xDiff > threshold || yDiff > threshold || zDiff > threshold) {
+            console.log(`Posture check failed: xDiff=${xDiff}, yDiff=${yDiff}, zDiff=${zDiff}`);
             return false;
         }
+        console.log(`Posture check passed: xDiff=${xDiff}, yDiff=${yDiff}, zDiff=${zDiff}`);
         return true;
     };
 
