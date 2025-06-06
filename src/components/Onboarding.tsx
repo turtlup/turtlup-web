@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Stepper, Step, StepLabel, Paper, useTheme } from '@mui/material';
-import { bluetoothService, IMUDataWithId } from '../services/BluetoothService';
+import { usePosture } from '../context/PostureContext';
 import BodyModel from './BodyModel';
 
 interface OnboardingProps {
@@ -10,41 +10,19 @@ interface OnboardingProps {
 const steps = [
   'Connect Device',
   'Sit in Neutral Position',
-  'Calibrate Sensors',
   'Complete'
 ];
 
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [imuData, setImuData] = useState<any[]>([]);
-  const [isConnected, setIsConnected] = useState(false);
   const theme = useTheme();
-
-  React.useEffect(() => {
-    bluetoothService.on('connected', () => {
-      console.log("Bluetooth connected event triggered.");
-      setIsConnected(true);
-    });
-    bluetoothService.on('imuData', (data: IMUDataWithId) => {
-      setImuData((prev) => {
-        const newData = [...prev];
-        newData.push(data);
-        // Limit to the last 100 entries for performance
-        if (newData.length > 100) {
-          newData.shift();
-        }
-        return newData;
-      });
-    });
-    bluetoothService.on('disconnected', () => {
-      console.log("Bluetooth disconnected event triggered.");
-      setIsConnected(false);
-    });
-
-    return () => {
-      bluetoothService.removeAllListeners();
-    };
-  }, []);
+  // Use the PostureContext instead of managing state locally
+  const {
+    currentImuData,
+    isConnected,
+    connectDevice,
+    setReferencePosture
+  } = usePosture();
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
@@ -60,18 +38,22 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   const handleConnect = async () => {
     try {
-      await bluetoothService.connect();
+      await connectDevice(); // Use context method instead
     } catch (error) {
       console.error('Failed to connect:', error);
     }
   };
 
-  // Placeholder for calibration logic
+  // Update the startCalibration function
   const startCalibration = () => {
     console.log("Starting calibration...");
-    // In a real app, you would send a command to the device here
-    // sendCommand('CALIBRATE_NEUTRAL_POSITION');
-    // After sending command and potentially receiving confirmation,
+
+    // Save the most recent IMU data as the reference posture
+    if (currentImuData) {
+      setReferencePosture(currentImuData);
+      console.log("Reference posture saved:", currentImuData);
+    }
+
     handleNext(); // Move to the next step (Calibrate Sensors)
   };
 
@@ -107,34 +89,32 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
               Keep your back straight and shoulders relaxed and click the button below when ready.
             </Typography>
-            <BodyModel
-              imuData={imuData}
-              width={300}
-              height={400}
-            />
+            {/* Only render BodyModel if we have data */}
+            {currentImuData && (
+              <Box sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                mb: 2
+              }}>
+                <BodyModel
+                  width={300}
+                  height={400}
+                />
+              </Box>
+            )}
             <Button
               variant="contained"
               onClick={startCalibration}
-              disabled={!isConnected} // Only enable if device is connected
+              disabled={!isConnected || !currentImuData} // Only enable if device is connected and data is available
               sx={{ mt: 3 }}
             >
-              Ready to Calibrate
+              Calibrate
             </Button>
           </Box>
         );
       case 2:
-        return (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Calibrating sensors...
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Please remain still while we calibrate your sensors
-            </Typography>
-            {/* Potentially show progress or data here */}
-          </Box>
-        );
-      case 3:
         return (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <Typography variant="h6" gutterBottom>
@@ -212,7 +192,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               onClick={handleNext}
               disabled={activeStep === 0 && !isConnected}
               size="medium"
-              // sx={{ p: 0 }} // Removed padding here as well
+            // sx={{ p: 0 }} // Removed padding here as well
             >
               {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
             </Button>

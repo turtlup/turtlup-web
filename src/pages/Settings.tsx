@@ -28,14 +28,6 @@ const Settings: React.FC = () => {
         </ListItem>
 
         <Divider />
-
-        <ListItem>
-          <ListItemText
-            primary="Dark Mode"
-            secondary="Switch between light and dark theme"
-          />
-          <Switch edge="end" />
-        </ListItem>
       </List>
     </Box>
   );
