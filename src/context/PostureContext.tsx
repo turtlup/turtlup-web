@@ -36,8 +36,13 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
         // Add isGoodPosture as a state object
 
         bluetoothService.on('imuData', (data: IMUDataWithId) => {
-            // Update current IMU data
+
             setCurrentImuData(data);
+
+            if (referencePosture === null) {
+                console.log("No reference posture set, skipping IMU data processing");
+                return;
+            }
 
             // Calculate posture status
             const goodPost = postureCheck(data);
@@ -47,7 +52,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
             setImuDataHistory(prev => {
                 const newHistory = [...prev, goodPost];
                 // Keep history to last 10 entries
-                if (newHistory.length > 10) {
+                if (newHistory.length > 200) {
                     newHistory.shift();
                 }
                 return newHistory;
@@ -61,7 +66,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
         return () => {
             bluetoothService.removeAllListeners();
         };
-    }, []);
+    }, [referencePosture]);
 
     // Connect device method
     const connectDevice = async () => {
