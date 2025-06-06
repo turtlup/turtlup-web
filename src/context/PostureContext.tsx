@@ -96,7 +96,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
         if (!referencePosture) return true; // No reference yet
 
         // Compare current IMU data with the reference
-        const threshold = 2; // Adjust this based on your sensitivity needs
+        const threshold = 3; // Adjust this based on your sensitivity needs
 
         // Check each IMU sensor data point
         // Calculate deviation from reference
