@@ -114,7 +114,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             </Button>
           </Box>
         );
-      case 3:
+      case 2:
         return (
           <Box sx={{ textAlign: 'center', mt: 4 }}>
             <Typography variant="h6" gutterBottom>
