@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { IMUDataWithId, bluetoothService } from '../services/BluetoothService';
-import { Preview } from '@mui/icons-material';
 
 interface PostureContextType {
     // Reference posture management
