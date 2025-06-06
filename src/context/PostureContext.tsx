@@ -1,11 +1,12 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { IMUDataWithId, bluetoothService } from '../services/BluetoothService';
+import { Preview } from '@mui/icons-material';
 
 interface PostureContextType {
     // Reference posture management
     referencePosture: IMUDataWithId | null;
     setReferencePosture: (data: IMUDataWithId) => void;
-    isGoodPosture: (currentData: IMUDataWithId | null) => boolean;
+    isGoodPosture: boolean;
 
     // IMU data distribution
     currentImuData: IMUDataWithId | null;
@@ -25,6 +26,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
     const [currentImuData, setCurrentImuData] = useState<IMUDataWithId | null>(null);
     const [imuDataHistory, setImuDataHistory] = useState<boolean[]>([]);
     const [isConnected, setIsConnected] = useState(false);
+    const [isGoodPosture, setIsGoodPosture] = useState<boolean>(true);
 
     // Set up Bluetooth event listeners
     useEffect(() => {
@@ -32,25 +34,30 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
             console.log("Bluetooth connected event in PostureContext");
             setIsConnected(true);
         });
-
-        bluetoothService.on('disconnected', () => {
-            console.log("Bluetooth disconnected event in PostureContext");
-            setIsConnected(false);
-        });
+        // Add isGoodPosture as a state object
 
         bluetoothService.on('imuData', (data: IMUDataWithId) => {
             // Update current IMU data
             setCurrentImuData(data);
 
+            // Calculate posture status
+            const goodPost = postureCheck(data);
+            setIsGoodPosture(goodPost);
+            console.log(`Posture check result: ${goodPost ? 'Good' : 'Bad'}`);
+
             // Update history with limited capacity
             setImuDataHistory(prev => {
-                const newHistory = [...prev, isGoodPosture(data)];
-                // Keep only the last 100 entries for performance
-                if (newHistory.length > 100) {
-                    return newHistory.slice(-100);
+                const newHistory = [...prev, goodPost];
+                // Keep history to last 10 entries
+                if (newHistory.length > 10) {
+                    newHistory.shift();
                 }
                 return newHistory;
-            });
+            })
+        });
+        bluetoothService.on('disconnected', () => {
+            console.log("Bluetooth disconnected event in PostureContext");
+            setIsConnected(false);
         });
 
         return () => {
@@ -81,12 +88,12 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
     };
 
     // Function to determine if current posture matches the reference posture
-    const isGoodPosture = (currentData: IMUDataWithId | null): boolean => {
+    const postureCheck = (currentData: IMUDataWithId | null): boolean => {
         if (!currentData) return false; // No current data to compare   
         if (!referencePosture) return true; // No reference yet
 
         // Compare current IMU data with the reference
-        const threshold = 5; // Adjust this based on your sensitivity needs
+        const threshold = 2; // Adjust this based on your sensitivity needs
 
         // Check each IMU sensor data point
         // Calculate deviation from reference
@@ -98,8 +105,6 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
         if (xDiff > threshold || yDiff > threshold || zDiff > threshold) {
             return false;
         }
-
-
         return true;
     };
 

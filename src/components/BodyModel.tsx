@@ -14,9 +14,8 @@ const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
   const {
     currentImuData,
     isGoodPosture
-  } = usePosture();
 
-  const goodPosture = isGoodPosture(currentImuData)
+  } = usePosture();
 
   return (
     <Stage width={width} height={height}>
@@ -26,18 +25,18 @@ const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
           x={width / 2}
           y={height / 2}
           radius={50}
-          fill={goodPosture ? 'green' : 'red'}
+          fill={isGoodPosture ? 'green' : 'red'}
           stroke="#333"
           strokeWidth={2}
         />
         <Text
           x={width / 2}
           y={height / 2 + 70} // Position it below the circle
-          text={goodPosture ? "In Alignment 😊" : "Out of Alignment 😔"}
+          text={isGoodPosture ? "In Alignment 😊" : "Out of Alignment 😔"}
           fontSize={18}
           fontFamily="Montserrat"
           fontStyle="bold"
-          fill={goodPosture ? "green" : "red"}
+          fill={isGoodPosture ? "green" : "red"}
           align="center"
           width={width}
           offsetX={width / 2} // Center the text horizontally
@@ -45,11 +44,11 @@ const BodyModel: React.FC<BodyModelProps> = ({ width, height }) => {
         <Text
           x={width / 2}
           y={height / 2 + 100} // Position it below the circle
-          text={goodPosture ? "Good Job!" : "Sit tall - feel strong!"}
+          text={isGoodPosture ? "Good Job!" : "Sit tall - feel strong!"}
           fontSize={12}
           fontFamily="Montserrat"
           fontStyle="bold"
-          fill={goodPosture ? "green" : "red"}
+          fill={isGoodPosture ? "green" : "red"}
           align="center"
           width={width}
           offsetX={width / 2} // Center the text horizontally
