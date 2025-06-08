@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { Box, Typography, Paper, Grid } from '@mui/material';
+import { Box, Typography, Paper, Grid, Tooltip } from '@mui/material';
 import { usePosture } from '../context/PostureContext';
 import { Pie } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ArcElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 // Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, ChartTooltip, Legend);
 
 const PostureStats: React.FC = () => {
   const { imuDataHistory, referencePosture, isGoodPosture } = usePosture();
@@ -106,9 +107,14 @@ const PostureStats: React.FC = () => {
             </Grid>
             <Grid item xs={12} md={4}>
               <Paper elevation={1} sx={{ p: 3, textAlign: 'center' }}>
-                <Typography variant="h5" gutterBottom>
-                  Good Posture
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, mb: 2 }}>
+                  <Typography variant="h5">
+                    Good Posture
+                  </Typography>
+                  <Tooltip title="This shows how many times you maintained good posture during the monitoring period. Good posture helps prevent back pain and improves overall health." placement="top">
+                    <HelpOutlineIcon sx={{ fontSize: 20, color: 'text.secondary', mt: 0.5, cursor: 'help' }} />
+                  </Tooltip>
+                </Box>
                 <Typography variant="h3" color="success.main">
                   {stats.goodPostureCount}
                 </Typography>

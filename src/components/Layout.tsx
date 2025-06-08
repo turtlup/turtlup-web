@@ -78,7 +78,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         }}
       >
         <TitleBox>
-          <Typography variant="h3" sx={{ fontWeight: 800, flexGrow: 1 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 800,
+              flexGrow: 1,
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8
+              }
+            }}
+            onClick={() => navigate('/')}
+          >
             TurtlUp
           </Typography>
           {/* Optional: Add a logo here */}
