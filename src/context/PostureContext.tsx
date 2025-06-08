@@ -101,11 +101,11 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     // Function to determine if current posture matches the reference posture
     const postureCheck = (currentData: IMUDataWithId | null): boolean => {
-        if (!currentData) return false; // No current data to compare   
+        if (!currentData) return false; // No current data to compare
         if (!referencePosture) return true; // No reference yet
 
         // Compare current IMU data with the reference
-        const threshold = 4; // Adjust this based on your sensitivity needs
+        const threshold = 3; // Adjust this based on your sensitivity needs
 
         // Check each IMU sensor data point
         // Calculate deviation from reference
@@ -130,7 +130,7 @@ export const PostureProvider: React.FC<{ children: ReactNode }> = ({ children })
                 setReferencePosture,
                 isGoodPosture,
 
-                // IMU data 
+                // IMU data
                 currentImuData,
                 imuDataHistory,
                 isConnected,

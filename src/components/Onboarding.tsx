@@ -82,7 +82,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         );
       case 1:
         return (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
+          <Box sx={{ textAlign: 'center' }}>
             <Typography variant="h6" gutterBottom>
               Sit in a neutral position
             </Typography>
@@ -93,25 +93,18 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {currentImuData && (
               <Box sx={{
                 width: '100%',
+                height: 300,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 mb: 2
               }}>
                 <BodyModel
-                  width={300}
-                  height={400}
+                  width={200}
+                  height={300}
                 />
               </Box>
             )}
-            <Button
-              variant="contained"
-              onClick={startCalibration}
-              disabled={!isConnected || !currentImuData} // Only enable if device is connected and data is available
-              sx={{ mt: 3 }}
-            >
-              Calibrate
-            </Button>
           </Box>
         );
       case 2:
@@ -135,14 +128,21 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       p: 4,
       display: 'flex',
       flexDirection: 'column',
-      height: 698,
+      height: 'calc(100vh - 200px)', // Adjust height to account for header and margins
       mt: 0,
+      overflow: 'hidden'
     }}>
 
       {/* Content section for Stepper, content, and buttons */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', pb: theme.spacing(2.5) }}>
+      <Box sx={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden'
+      }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={{
-          mb: 4,
+          mb: 3,
           justifyContent: 'center',
           '& .MuiStepLabel-label': { fontSize: '0.9rem' },
           '& .MuiStepIcon-root': {
@@ -159,16 +159,16 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         </Stepper>
         {/* Container for step content, takes remaining space */}
         <Box sx={{
-          mt: 4,
-          mb: 4,
           flexGrow: 1,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          overflow: 'auto',
+          py: 2,
           '& .MuiTypography-h6': {
             fontSize: '1.5rem',
-            mb: 3
+            mb: 2
           },
           '& .MuiTypography-body1': {
             fontSize: '1rem'
@@ -176,7 +176,13 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         }}>
           {renderStepContent(activeStep)}
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 4 }}>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '100%',
+          mt: 2,
+          flexShrink: 0
+        }}>
           <Button
             disabled={activeStep === 0 || activeStep === steps.length - 1}
             onClick={handleBack}
@@ -186,17 +192,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           >
             Back
           </Button>
-          {activeStep !== 1 && (
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={activeStep === 0 && !isConnected}
-              size="medium"
-            // sx={{ p: 0 }} // Removed padding here as well
-            >
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            onClick={activeStep === 1 ? startCalibration : handleNext}
+            disabled={activeStep === 0 && !isConnected}
+            size="medium"
+          >
+            {activeStep === 1 ? 'Calibrate' : activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+          </Button>
         </Box>
       </Box>
     </Paper>
